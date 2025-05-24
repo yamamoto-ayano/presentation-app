@@ -17,6 +17,10 @@ io.on("connection", (socket) => {
     io.emit("stamp", data); // 全員にブロードキャスト
   });
 
+  socket.on("clap", (data) => {
+    io.emit("clap", data); // 全員にブロードキャスト
+  });
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
