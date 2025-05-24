@@ -1,73 +1,36 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { io } from "socket.io-client";
 
-const WS_URL = "wss://presentation-app-nef9.onrender.com"; // Render本番用
-
-function useStableWebSocket(url: string, onMessage: (data: string) => void) {
-  const wsRef = useRef<WebSocket | null>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    let ws: WebSocket | null = null;
-    let reconnectTimer: NodeJS.Timeout | null = null;
-    const connect = () => {
-      ws = new WebSocket(url);
-      wsRef.current = ws;
-      ws.onopen = () => setReady(true);
-      ws.onclose = () => {
-        setReady(false);
-        reconnectTimer = setTimeout(connect, 1500);
-      };
-      ws.onerror = () => {
-        setReady(false);
-        ws?.close();
-      };
-      ws.onmessage = (event) => {
-        onMessage(event.data as string);
-      };
-    };
-    connect();
-    return () => {
-      ws?.close();
-      if (reconnectTimer) clearTimeout(reconnectTimer);
-    };
-  }, [url, onMessage]);
-  return { wsRef, ready };
-}
+const WS_URL = "wss://presentation-app-nef9.onrender.com";
 
 export default function Presenter() {
   const [show, setShow] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const socketRef = useRef<any>(null);
 
-  const handleMessage = (data: string | ArrayBuffer) => {
-    let text = "";
-    if (typeof data === "string") {
-      text = data;
-    } else if (data instanceof ArrayBuffer) {
-      text = new TextDecoder().decode(data);
-    }
-    try {
-      const parsed = JSON.parse(text);
-      if (parsed.type === "stamp") {
-        setShow(true);
-        if (audioRef.current) {
-          audioRef.current.currentTime = 0;
-          audioRef.current.play().catch((e) => {
-            console.error("音声再生エラー", e);
-          });
-        }
-        if (timerRef.current) clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => setShow(false), 2000);
+  useEffect(() => {
+    const socket = io(WS_URL, { transports: ["websocket"] });
+    socketRef.current = socket;
+    socket.on("stamp", (data: any) => {
+      setShow(true);
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch((e) => {
+          console.error("音声再生エラー", e);
+        });
       }
-    } catch {}
-  };
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setShow(false), 2000);
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
-  useStableWebSocket(WS_URL, handleMessage);
-
-  // 最初のユーザー操作で音声を有効化
   const enableAudio = () => {
     if (audioRef.current) {
       audioRef.current.play().catch((e) => {
