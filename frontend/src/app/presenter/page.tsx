@@ -81,10 +81,6 @@ export default function Presenter() {
       )}
       {show && (
         <div style={{
-          background: "rgba(0,0,0,0.0)",
-          borderRadius: 16,
-          boxShadow: "0 4px 24px #0006",
-          padding: 0,
           animation: "pop 0.2s",
           display: "flex",
           alignItems: "center",
