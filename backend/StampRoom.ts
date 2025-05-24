@@ -6,6 +6,8 @@ export class StampRoom {
     this.state = state;
   }
 
+
+  
   async fetch(request: Request) {
     if (request.headers.get("Upgrade") !== "websocket") {
       return new Response("Expected Upgrade: websocket", { status: 426 });
