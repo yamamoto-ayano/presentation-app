@@ -1,32 +1,29 @@
 import { Hono } from 'hono';
-import { serve } from '@hono/node-server';
-import { WebSocketServer } from 'ws';
-import type { Server } from 'http';
+
+declare var WebSocketPair: {
+  new (): [WebSocket, WebSocket];
+};
 
 const app = new Hono();
 
-app.get('/', (c) => c.text('Hono WebSocket server is running!'));
+app.get('/', (c) => c.text('Hono WebSocket server (Cloudflare Workers) is running!'));
 
-// HTTPサーバーを起動
-const server = serve({
-  fetch: app.fetch,
-  port: 8787,
-});
-
-// WebSocketサーバーを同じポートで起動
-const wss = new WebSocketServer({ server: server as unknown as Server });
-
-wss.on('connection', (ws) => {
-  ws.send(JSON.stringify({ type: 'info', message: 'WebSocket connected!' }));
-
-  ws.on('message', (data) => {
-    // 受信したメッセージを全クライアントにブロードキャスト
-    (wss.clients as Set<typeof ws>).forEach((client) => {
-      if (client.readyState === ws.OPEN) {
-        client.send(data);
-      }
-    });
+app.get('/ws', (c) => {
+  const upgradeHeader = c.req.header('Upgrade');
+  if (!upgradeHeader || upgradeHeader.toLowerCase() !== 'websocket') {
+    return c.text('Expected Upgrade: websocket', 426);
+  }
+  // Cloudflare Workers: Use WebSocketPair
+  const pair = new WebSocketPair();
+  const client = pair[0];
+  const server = pair[1];
+  // @ts-expect-error Cloudflare Workers provides accept() at runtime
+  server.accept();
+  server.addEventListener('message', (event) => {
+    server.send(event.data);
   });
+  // @ts-expect-error webSocket is a valid property in Workers runtime
+  return new Response(null, { status: 101, webSocket: server });
 });
 
-console.log('Hono + WebSocket server started on http://localhost:8787'); 
+export default app; 
