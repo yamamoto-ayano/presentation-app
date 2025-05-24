@@ -33,7 +33,7 @@ export default function Home() {
         setSentType(type);
         setCooldown(true);
         setTimeout(() => setSent(false), 1200);
-        setTimeout(() => setCooldown(false), 5000);
+        setTimeout(() => setCooldown(false), 1000);
       }, 600);
     } else {
       setSending(false);

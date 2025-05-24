@@ -122,7 +122,7 @@ export default function Presenter() {
           margin: "auto",
           pointerEvents: "none"
         }}>
-          <Image src="/clap.png" alt="拍手" width={320} height={320} priority style={{ maxWidth: "60vw", maxHeight: "60vh" }} />
+          <Image src="/clap.png" alt="拍手" width={200} height={200} priority style={{ maxWidth: "60vw", maxHeight: "60vh" }} />
         </div>
       )}
       <style>{`
