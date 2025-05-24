@@ -84,7 +84,10 @@ export default function Presenter() {
       alignItems: "center",
       justifyContent: "center"
     }}>
-      <audio ref={audioRef} src="/oyasymi.m4a" preload="auto" />
+      <audio ref={audioRef} preload="auto">
+        <source src="/stamp.mp3" type="audio/mp3" />
+        <source src="/oyasymi.m4a" type="audio/mp4" />
+      </audio>
       {!audioReady && (
         <button
           style={{
