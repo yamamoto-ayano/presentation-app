@@ -1,0 +1,51 @@
+# Node
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+.next/
+dist/
+out/
+
+# Env
+.env
+.env.*
+
+# Vercel/Netlify/Render
+.vercel/
+.netlify/
+.render/
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.local
+*.swp
+
+# Coverage
+coverage/
+
+# Others
+*.tgz
+
+# Mac
+*.DS_Store
+
+# Optional: ignore video/audio/image cache
+*.mp4
+*.mov
+*.avi
+*.m4a
+*.mp3 
