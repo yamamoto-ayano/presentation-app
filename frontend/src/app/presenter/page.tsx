@@ -93,11 +93,11 @@ export default function Presenter() {
           left: "50%",
           top: "50%",
           transform: "translate(-50%, -50%)",
-          width: "60vw",
-          height: "auto",
-          zIndex: 100000,
+          width: "90vw",
+          height: "90vh",
+          zIndex: 2147483647,
           background: "black",
-          display: ipponPlaying ? "block" : "none"
+          display: "block"
         }}
         preload="auto"
       />
