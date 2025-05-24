@@ -2,34 +2,38 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { io, type Socket } from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
 
 const WS_URL = "wss://presentation-app-nef9.onrender.com";
 
 export default function Presenter() {
-  const [show, setShow] = useState(false);
-  const [showClap, setShowClap] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const [stamps, setStamps] = useState<{ id: string; type: "stamp" | "clap" }[]>([]);
 
   useEffect(() => {
     const socket = io(WS_URL, { transports: ["websocket"] });
     socketRef.current = socket;
     socket.on("stamp", () => {
-      setShow(true);
+      const id = uuidv4();
+      setStamps((prev) => [...prev, { id, type: "stamp" }]);
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch((e) => {
           console.error("音声再生エラー", e);
         });
       }
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setShow(false), 2000);
+      setTimeout(() => {
+        setStamps((prev) => prev.filter((s) => s.id !== id));
+      }, 2000);
     });
     socket.on("clap", () => {
-      setShowClap(true);
-      setTimeout(() => setShowClap(false), 2000);
+      const id = uuidv4();
+      setStamps((prev) => [...prev, { id, type: "clap" }]);
+      setTimeout(() => {
+        setStamps((prev) => prev.filter((s) => s.id !== id));
+      }, 2000);
     });
     return () => {
       socket.disconnect();
@@ -92,38 +96,40 @@ export default function Presenter() {
           音声を有効にする
         </button>
       )}
-      {show && (
-        <div style={{
-          animation: "pop 0.2s",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          margin: "auto",
-        }}>
-          <Image src="/stamp.png" alt="ちょっと待て！！スタンプ" width={600} height={600} priority style={{ transition: "transform 0.2s", maxWidth: "90vw", maxHeight: "90vh" }} />
-        </div>
-      )}
-      {showClap && (
-        <div style={{
-          animation: "clap-float 2s cubic-bezier(0.22, 1, 0.36, 1)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          margin: "auto",
-          pointerEvents: "none"
-        }}>
-          <Image src="/clap.png" alt="拍手" width={200} height={200} priority style={{ maxWidth: "60vw", maxHeight: "60vh" }} />
-        </div>
+      {stamps.map((s) =>
+        s.type === "stamp" ? (
+          <div key={s.id} style={{
+            animation: "pop 0.2s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            margin: "auto",
+            pointerEvents: "none"
+          }}>
+            <Image src="/stamp.png" alt="ちょっと待て！！スタンプ" width={600} height={600} priority style={{ transition: "transform 0.2s", maxWidth: "90vw", maxHeight: "90vh" }} />
+          </div>
+        ) : (
+          <div key={s.id} style={{
+            animation: "clap-float 2s cubic-bezier(0.22, 1, 0.36, 1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            margin: "auto",
+            pointerEvents: "none"
+          }}>
+            <Image src="/clap.png" alt="拍手" width={320} height={320} priority style={{ maxWidth: "60vw", maxHeight: "60vh" }} />
+          </div>
+        )
       )}
       <style>{`
         @keyframes pop {
