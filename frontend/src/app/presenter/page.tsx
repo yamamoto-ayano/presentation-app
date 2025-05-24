@@ -38,6 +38,7 @@ function useStableWebSocket(url: string, onMessage: (data: string) => void) {
 
 export default function Presenter() {
   const [show, setShow] = useState(false);
+  const [audioReady, setAudioReady] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -48,7 +49,7 @@ export default function Presenter() {
         setShow(true);
         if (audioRef.current) {
           audioRef.current.currentTime = 0;
-          audioRef.current.play();
+          audioRef.current.play().catch(() => {});
         }
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => setShow(false), 2000); // 2秒表示
@@ -58,9 +59,39 @@ export default function Presenter() {
 
   useStableWebSocket(WS_URL, handleMessage);
 
+  // 最初のユーザー操作で音声を有効化
+  const enableAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => {});
+      setAudioReady(true);
+    }
+  };
+
   return (
     <div style={{ position: "fixed", right: 32, bottom: 32, zIndex: 99999, pointerEvents: "none" }}>
       <audio ref={audioRef} src="/stamp.mp3" preload="auto" />
+      {!audioReady && (
+        <button
+          style={{
+            position: "fixed",
+            top: 32,
+            right: 32,
+            zIndex: 100000,
+            pointerEvents: "auto",
+            fontSize: 20,
+            padding: "12px 32px",
+            borderRadius: 8,
+            background: "#e53935",
+            color: "#fff",
+            border: "none",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+          onClick={enableAudio}
+        >
+          音声を有効にする
+        </button>
+      )}
       {show && (
         <div style={{
           background: "rgba(0,0,0,0.0)",
