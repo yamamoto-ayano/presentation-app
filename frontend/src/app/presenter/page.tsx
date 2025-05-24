@@ -39,14 +39,19 @@ function useStableWebSocket(url: string, onMessage: (data: string) => void) {
 export default function Presenter() {
   const [show, setShow] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleMessage = (data: string) => {
     try {
       const parsed = JSON.parse(data);
       if (parsed.type === "stamp") {
         setShow(true);
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play();
+        }
         if (timerRef.current) clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => setShow(false), 1000);
+        timerRef.current = setTimeout(() => setShow(false), 2000); // 2秒表示
       }
     } catch {}
   };
@@ -55,6 +60,7 @@ export default function Presenter() {
 
   return (
     <div style={{ position: "fixed", right: 32, bottom: 32, zIndex: 99999, pointerEvents: "none" }}>
+      <audio ref={audioRef} src="/stamp.mp3" preload="auto" />
       {show && (
         <div style={{
           background: "rgba(0,0,0,0.0)",
