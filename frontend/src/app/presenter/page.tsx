@@ -31,6 +31,14 @@ export default function Presenter() {
     };
   }, []);
 
+  useEffect(() => {
+    const original = document.body.style.background;
+    document.body.style.background = "transparent";
+    return () => {
+      document.body.style.background = original;
+    };
+  }, []);
+
   const enableAudio = () => {
     if (audioRef.current) {
       audioRef.current.play().catch((e) => {
