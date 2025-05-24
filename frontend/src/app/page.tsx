@@ -23,7 +23,7 @@ export default function Home() {
     };
   }, []);
 
-  const handleSend = (type: "stamp" | "clap") => {
+  const handleSend = (type: "stamp" | "clap" | "ippon") => {
     setSending(true);
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit(type, { type });
@@ -31,9 +31,9 @@ export default function Home() {
         setSending(false);
         setSent(true);
         setSentType(type);
-        setCooldown(true);
+        if (type === "stamp") setCooldown(true);
         setTimeout(() => setSent(false), 1200);
-        setTimeout(() => setCooldown(false), 1000);
+        if (type === "stamp") setTimeout(() => setCooldown(false), 1000);
       }, 600);
     } else {
       setSending(false);
@@ -92,10 +92,40 @@ export default function Home() {
             }}
           />
         </button>
+        <button
+          onClick={() => handleSend("ippon")}
+          disabled={sending || !ready || cooldown}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            cursor: sending || !ready || cooldown ? "not-allowed" : "pointer",
+            outline: "none",
+          }}
+        >
+          <Image
+            src="/ipponButton.png"
+            alt="いっぽんを送る"
+            width={180}
+            height={180}
+            priority
+            style={{
+              filter: sending ? "grayscale(1) blur(2px)" : "none",
+              opacity: !ready ? 0.5 : 1,
+              transition: "0.3s"
+            }}
+          />
+        </button>
       </div>
       {sent && (
         <div style={{ color: "#fff", fontSize: 24, marginTop: 24, fontWeight: "bold", textShadow: "0 2px 8px #000" }}>
-          {sentType === "stamp" ? "送信完了！" : sentType === "clap" ? "拍手を送りました！" : "送信完了！"}
+          {sentType === "stamp"
+            ? "送信完了！"
+            : sentType === "clap"
+            ? "拍手を送りました！"
+            : sentType === "ippon"
+            ? "いっぽんを送りました！"
+            : "送信完了！"}
         </div>
       )}
     </div>

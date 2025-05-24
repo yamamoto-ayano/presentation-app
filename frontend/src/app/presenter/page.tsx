@@ -11,6 +11,8 @@ export default function Presenter() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const [stamps, setStamps] = useState<{ id: string; type: "stamp" | "clap"; x?: number }[]>([]);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [ipponPlaying, setIpponPlaying] = useState(false);
 
   useEffect(() => {
     const socket = io(WS_URL, { transports: ["websocket"] });
@@ -35,6 +37,14 @@ export default function Presenter() {
       setTimeout(() => {
         setStamps((prev) => prev.filter((s) => s.id !== id));
       }, 3000);
+    });
+    socket.on("ippon", () => {
+      if (!ipponPlaying && videoRef.current) {
+        setIpponPlaying(true);
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {});
+        videoRef.current.onended = () => setIpponPlaying(false);
+      }
     });
     return () => {
       socket.disconnect();
@@ -75,6 +85,12 @@ export default function Presenter() {
         <source src="/stamp.mp3" type="audio/mp3" />
         <source src="/oyasymi.m4a" type="audio/mp4" />
       </audio>
+      <video
+        ref={videoRef}
+        src="/ippon.mov"
+        style={{ display: "none" }}
+        preload="auto"
+      />
       {!audioReady && (
         <button
           style={{

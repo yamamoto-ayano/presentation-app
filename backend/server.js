@@ -21,6 +21,10 @@ io.on("connection", (socket) => {
     io.emit("clap", data); // 全員にブロードキャスト
   });
 
+  socket.on("ippon", (data) => {
+    io.emit("ippon", data); // 全員にブロードキャスト
+  });
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
