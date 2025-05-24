@@ -42,9 +42,15 @@ export default function Presenter() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const handleMessage = (data: string) => {
+  const handleMessage = (data: string | ArrayBuffer) => {
+    let text = "";
+    if (typeof data === "string") {
+      text = data;
+    } else if (data instanceof ArrayBuffer) {
+      text = new TextDecoder().decode(data);
+    }
     try {
-      const parsed = JSON.parse(data);
+      const parsed = JSON.parse(text);
       if (parsed.type === "stamp") {
         setShow(true);
         if (audioRef.current) {
@@ -54,7 +60,7 @@ export default function Presenter() {
           });
         }
         if (timerRef.current) clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => setShow(false), 2000); // 2秒表示
+        timerRef.current = setTimeout(() => setShow(false), 2000);
       }
     } catch {}
   };
