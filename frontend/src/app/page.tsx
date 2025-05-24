@@ -38,26 +38,29 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: "#111" }}>
-      <div style={{ marginBottom: 32 }}>
-        <Image src="/stamp.png" alt="ちょっと待て！！スタンプ" width={240} height={240} priority style={{ filter: sending ? "grayscale(1) blur(2px)" : "none", transition: "0.3s" }} />
-      </div>
       <button
         onClick={handleSend}
         disabled={sending || !ready}
         style={{
-          fontSize: 24,
-          background: sent ? "#e53935" : "#fff",
-          color: sent ? "#fff" : "#e53935",
-          border: "2px solid #e53935",
-          borderRadius: 12,
-          padding: "16px 48px",
-          fontWeight: "bold",
+          background: "none",
+          border: "none",
+          padding: 0,
           cursor: sending || !ready ? "not-allowed" : "pointer",
-          boxShadow: sent ? "0 0 24px #e53935" : "none",
-          transition: "all 0.3s",
+          outline: "none",
         }}
       >
-        {sending ? "送信中..." : sent ? "送信しました！" : !ready ? "接続中..." : "スタンプを送る"}
+        <Image
+          src="/button.png"
+          alt="スタンプを送る"
+          width={240}
+          height={240}
+          priority
+          style={{
+            filter: sending ? "grayscale(1) blur(2px)" : "none",
+            opacity: !ready ? 0.5 : 1,
+            transition: "0.3s"
+          }}
+        />
       </button>
     </div>
   );
