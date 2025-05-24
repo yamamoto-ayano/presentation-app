@@ -42,7 +42,9 @@ export default function Presenter() {
       if (!ipponPlaying && videoRef.current) {
         setIpponPlaying(true);
         videoRef.current.currentTime = 0;
-        videoRef.current.play().catch(() => {});
+        videoRef.current.play().catch((e) => {
+          console.error("動画再生エラー", e);
+        });
         videoRef.current.onended = () => setIpponPlaying(false);
       }
     });
@@ -95,11 +97,11 @@ export default function Presenter() {
           transform: "translate(-50%, -50%)",
           width: "90vw",
           height: "90vh",
-          zIndex: 2147483647,
           background: "black",
-          display: "block"
+          display: ipponPlaying ? "block" : "none"
         }}
         preload="auto"
+        controls
       />
       {!audioReady && (
         <button
