@@ -88,9 +88,18 @@ export default function Presenter() {
       <video
         ref={videoRef}
         src="/ippon.mp4"
-        style={{ width: 1, height: 1, opacity: 0, position: "absolute" }}
+        style={{
+          position: "fixed",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "60vw",
+          height: "auto",
+          zIndex: 100000,
+          background: "black",
+          display: ipponPlaying ? "block" : "none"
+        }}
         preload="auto"
-        muted
       />
       {!audioReady && (
         <button
