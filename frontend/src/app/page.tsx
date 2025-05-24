@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-const WS_URL = "wss://presentation-app-backend.daigaku-150207.workers.dev/ws"; // Cloudflare Workers本番用
+const WS_URL = "wss://presentation-app-nef9.onrender.com"; // Render本番用
 
 function useStableWebSocket(url: string) {
   const wsRef = useRef<WebSocket | null>(null);
