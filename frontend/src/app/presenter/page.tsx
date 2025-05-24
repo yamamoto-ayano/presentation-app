@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { io } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
 const WS_URL = "wss://presentation-app-nef9.onrender.com";
 
@@ -10,12 +10,12 @@ export default function Presenter() {
   const [audioReady, setAudioReady] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const socketRef = useRef<any>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     const socket = io(WS_URL, { transports: ["websocket"] });
     socketRef.current = socket;
-    socket.on("stamp", (data: any) => {
+    socket.on("stamp", () => {
       setShow(true);
       if (audioRef.current) {
         audioRef.current.currentTime = 0;

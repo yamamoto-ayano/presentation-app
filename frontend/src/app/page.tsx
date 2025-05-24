@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
 const WS_URL = "wss://presentation-app-nef9.onrender.com"; // Render本番用
 
@@ -9,7 +9,7 @@ export default function Home() {
   const [ready, setReady] = useState(false);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
-  const socketRef = useRef<any>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     const socket = io(WS_URL, { transports: ["websocket"] });
