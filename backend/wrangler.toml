@@ -1,3 +1,15 @@
 name = "presentation-app-backend"
 main = "index.ts"
-compatibility_date = "2024-05-24" 
+compatibility_date = "2024-05-24"
+
+[durable_objects]
+bindings = [
+  { name = "STAMP_ROOM", class_name = "StampRoom" }
+]
+
+[vars]
+# 追加の環境変数があればここに 
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["StampRoom"] 
