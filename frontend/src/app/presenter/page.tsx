@@ -39,13 +39,12 @@ export default function Presenter() {
       }, 3000);
     });
     socket.on("ippon", () => {
-      if (!ipponPlaying && videoRef.current) {
+      if (videoRef.current) {
         setIpponPlaying(true);
         videoRef.current.currentTime = 0;
         videoRef.current.play().catch((e) => {
           console.error("動画再生エラー", e);
         });
-        videoRef.current.onended = () => setIpponPlaying(false);
       }
     });
     return () => {
@@ -97,11 +96,12 @@ export default function Presenter() {
           transform: "translate(-50%, -50%)",
           width: "90vw",
           height: "90vh",
-          background: "black",
-          display: ipponPlaying ? "block" : "none"
+          display: ipponPlaying ? "block" : "none",
+          zIndex: 100000
         }}
         preload="auto"
-        controls
+        controls={false}
+        onEnded={() => setIpponPlaying(false)}
       />
       {!audioReady && (
         <button
