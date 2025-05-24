@@ -49,7 +49,9 @@ export default function Presenter() {
         setShow(true);
         if (audioRef.current) {
           audioRef.current.currentTime = 0;
-          audioRef.current.play().catch(() => {});
+          audioRef.current.play().catch((e) => {
+            console.error("音声再生エラー", e);
+          });
         }
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => setShow(false), 2000); // 2秒表示
@@ -62,13 +64,26 @@ export default function Presenter() {
   // 最初のユーザー操作で音声を有効化
   const enableAudio = () => {
     if (audioRef.current) {
-      audioRef.current.play().catch(() => {});
+      audioRef.current.play().catch((e) => {
+        console.error("音声有効化エラー", e);
+      });
       setAudioReady(true);
     }
   };
 
   return (
-    <div style={{ position: "fixed", right: 32, bottom: 32, zIndex: 99999, pointerEvents: "none" }}>
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 99999,
+      pointerEvents: "none",
+      background: "transparent",
+      width: "100vw",
+      height: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    }}>
       <audio ref={audioRef} src="/stamp.mp3" preload="auto" />
       {!audioReady && (
         <button
@@ -99,8 +114,11 @@ export default function Presenter() {
           boxShadow: "0 4px 24px #0006",
           padding: 0,
           animation: "pop 0.2s",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
         }}>
-          <Image src="/stamp.png" alt="ちょっと待て！！スタンプ" width={180} height={180} priority style={{ transition: "transform 0.2s" }} />
+          <Image src="/stamp.png" alt="ちょっと待て！！スタンプ" width={320} height={320} priority style={{ transition: "transform 0.2s" }} />
         </div>
       )}
       <style>{`
