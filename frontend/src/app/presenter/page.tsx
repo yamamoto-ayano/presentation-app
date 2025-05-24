@@ -10,7 +10,7 @@ export default function Presenter() {
   const [audioReady, setAudioReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
-  const [stamps, setStamps] = useState<{ id: string; type: "stamp" | "clap" }[]>([]);
+  const [stamps, setStamps] = useState<{ id: string; type: "stamp" | "clap"; x?: number }[]>([]);
 
   useEffect(() => {
     const socket = io(WS_URL, { transports: ["websocket"] });
@@ -30,10 +30,11 @@ export default function Presenter() {
     });
     socket.on("clap", () => {
       const id = uuidv4();
-      setStamps((prev) => [...prev, { id, type: "clap" }]);
+      const x = Math.random() * 70 + 10;
+      setStamps((prev) => [...prev, { id, type: "clap", x }]);
       setTimeout(() => {
         setStamps((prev) => prev.filter((s) => s.id !== id));
-      }, 2000);
+      }, 3000);
     });
     return () => {
       socket.disconnect();
@@ -115,19 +116,17 @@ export default function Presenter() {
           </div>
         ) : (
           <div key={s.id} style={{
-            animation: "clap-float 2s cubic-bezier(0.22, 1, 0.36, 1)",
+            animation: `clap-float-random 3s cubic-bezier(0.22, 1, 0.36, 1)`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             position: "absolute",
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            margin: "auto",
-            pointerEvents: "none"
+            left: `${s.x ?? 50}%`,
+            top: "70%",
+            pointerEvents: "none",
+            transform: "translate(-50%, 0)",
           }}>
-            <Image src="/clap.png" alt="拍手" width={320} height={320} priority style={{ maxWidth: "60vw", maxHeight: "60vh" }} />
+            <Image src="/clap.png" alt="拍手" width={180} height={180} priority style={{ maxWidth: "30vw", maxHeight: "30vh" }} />
           </div>
         )
       )}
@@ -136,11 +135,11 @@ export default function Presenter() {
           0% { transform: scale(0.7); opacity: 0; }
           100% { transform: scale(1); opacity: 1; }
         }
-        @keyframes clap-float {
-          0% { transform: translateY(60px) scale(0.7); opacity: 0; }
+        @keyframes clap-float-random {
+          0% { transform: translate(-50%, 0) scale(0.7); opacity: 0; }
           10% { opacity: 1; }
-          60% { transform: translateY(-20px) scale(1.1); opacity: 1; }
-          100% { transform: translateY(-120px) scale(1); opacity: 0; }
+          60% { transform: translate(-50%, -80px) scale(1.1); opacity: 1; }
+          100% { transform: translate(-50%, -240px) scale(1); opacity: 0; }
         }
       `}</style>
     </div>
