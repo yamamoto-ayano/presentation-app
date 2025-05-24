@@ -70,12 +70,12 @@ export default function Home() {
         </button>
         <button
           onClick={() => handleSend("clap")}
-          disabled={sending || !ready || cooldown}
+          disabled={sending || !ready}
           style={{
             background: "none",
             border: "none",
             padding: 0,
-            cursor: sending || !ready || cooldown ? "not-allowed" : "pointer",
+            cursor: sending || !ready ? "not-allowed" : "pointer",
             outline: "none",
           }}
         >
@@ -87,7 +87,7 @@ export default function Home() {
             priority
             style={{
               filter: sending ? "grayscale(1) blur(2px)" : "none",
-              opacity: !ready || cooldown ? 0.5 : 1,
+              opacity: !ready ? 0.5 : 1,
               transition: "0.3s"
             }}
           />
