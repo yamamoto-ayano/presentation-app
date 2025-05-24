@@ -87,7 +87,7 @@ export default function Presenter() {
       </audio>
       <video
         ref={videoRef}
-        src="/ippon.mov"
+        src="/ippon.mp4"
         style={{ display: "none" }}
         preload="auto"
       />
