@@ -88,8 +88,9 @@ export default function Presenter() {
       <video
         ref={videoRef}
         src="/ippon.mp4"
-        style={{ display: "none" }}
+        style={{ width: 1, height: 1, opacity: 0, position: "absolute" }}
         preload="auto"
+        muted
       />
       {!audioReady && (
         <button
