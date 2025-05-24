@@ -10,6 +10,7 @@ export default function Home() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [cooldown, setCooldown] = useState(false);
+  const [sentType, setSentType] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -22,13 +23,14 @@ export default function Home() {
     };
   }, []);
 
-  const handleSend = () => {
+  const handleSend = (type: "stamp" | "clap") => {
     setSending(true);
     if (socketRef.current && socketRef.current.connected) {
-      socketRef.current.emit("stamp", { type: "stamp" });
+      socketRef.current.emit(type, { type });
       setTimeout(() => {
         setSending(false);
         setSent(true);
+        setSentType(type);
         setCooldown(true);
         setTimeout(() => setSent(false), 1200);
         setTimeout(() => setCooldown(false), 5000);
@@ -41,33 +43,59 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: "#111" }}>
-      <button
-        onClick={handleSend}
-        disabled={sending || !ready || cooldown}
-        style={{
-          background: "none",
-          border: "none",
-          padding: 0,
-          cursor: sending || !ready || cooldown ? "not-allowed" : "pointer",
-          outline: "none",
-        }}
-      >
-        <Image
-          src="/button.png"
-          alt="スタンプを送る"
-          width={240}
-          height={240}
-          priority
+      <div style={{ display: "flex", gap: 32 }}>
+        <button
+          onClick={() => handleSend("stamp")}
+          disabled={sending || !ready || cooldown}
           style={{
-            filter: sending ? "grayscale(1) blur(2px)" : "none",
-            opacity: !ready || cooldown ? 0.5 : 1,
-            transition: "0.3s"
+            background: "none",
+            border: "none",
+            padding: 0,
+            cursor: sending || !ready || cooldown ? "not-allowed" : "pointer",
+            outline: "none",
           }}
-        />
-      </button>
+        >
+          <Image
+            src="/button.png"
+            alt="スタンプを送る"
+            width={180}
+            height={180}
+            priority
+            style={{
+              filter: sending ? "grayscale(1) blur(2px)" : "none",
+              opacity: !ready || cooldown ? 0.5 : 1,
+              transition: "0.3s"
+            }}
+          />
+        </button>
+        <button
+          onClick={() => handleSend("clap")}
+          disabled={sending || !ready || cooldown}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            cursor: sending || !ready || cooldown ? "not-allowed" : "pointer",
+            outline: "none",
+          }}
+        >
+          <Image
+            src="/clap.png"
+            alt="拍手を送る"
+            width={180}
+            height={180}
+            priority
+            style={{
+              filter: sending ? "grayscale(1) blur(2px)" : "none",
+              opacity: !ready || cooldown ? 0.5 : 1,
+              transition: "0.3s"
+            }}
+          />
+        </button>
+      </div>
       {sent && (
         <div style={{ color: "#fff", fontSize: 24, marginTop: 24, fontWeight: "bold", textShadow: "0 2px 8px #000" }}>
-          送信完了！
+          {sentType === "stamp" ? "送信完了！" : sentType === "clap" ? "拍手を送りました！" : "送信完了！"}
         </div>
       )}
     </div>

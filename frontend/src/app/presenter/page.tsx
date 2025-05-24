@@ -7,6 +7,7 @@ const WS_URL = "wss://presentation-app-nef9.onrender.com";
 
 export default function Presenter() {
   const [show, setShow] = useState(false);
+  const [showClap, setShowClap] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -25,6 +26,10 @@ export default function Presenter() {
       }
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setShow(false), 2000);
+    });
+    socket.on("clap", () => {
+      setShowClap(true);
+      setTimeout(() => setShowClap(false), 2000);
     });
     return () => {
       socket.disconnect();
@@ -92,15 +97,44 @@ export default function Presenter() {
           animation: "pop 0.2s",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center"
+          justifyContent: "center",
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          margin: "auto",
         }}>
-          <Image src="/stamp.png" alt="ちょっと待て！！スタンプ" width={320} height={320} priority style={{ transition: "transform 0.2s" }} />
+          <Image src="/stamp.png" alt="ちょっと待て！！スタンプ" width={600} height={600} priority style={{ transition: "transform 0.2s", maxWidth: "90vw", maxHeight: "90vh" }} />
+        </div>
+      )}
+      {showClap && (
+        <div style={{
+          animation: "clap-float 2s cubic-bezier(0.22, 1, 0.36, 1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          margin: "auto",
+          pointerEvents: "none"
+        }}>
+          <Image src="/clap.png" alt="拍手" width={320} height={320} priority style={{ maxWidth: "60vw", maxHeight: "60vh" }} />
         </div>
       )}
       <style>{`
         @keyframes pop {
           0% { transform: scale(0.7); opacity: 0; }
           100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes clap-float {
+          0% { transform: translateY(60px) scale(0.7); opacity: 0; }
+          10% { opacity: 1; }
+          60% { transform: translateY(-20px) scale(1.1); opacity: 1; }
+          100% { transform: translateY(-120px) scale(1); opacity: 0; }
         }
       `}</style>
     </div>
