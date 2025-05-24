@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 const WS_URL = "wss://presentation-app-backend.daigaku-150207.workers.dev/ws"; // Cloudflare Workers本番用
 
-function useStableWebSocket(url: string) {
+function useStableWebSocket(url: string, onMessage: (data: string) => void) {
   const wsRef = useRef<WebSocket | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -36,7 +36,9 @@ function useStableWebSocket(url: string) {
 export default function Home() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
-  const { wsRef, ready } = useStableWebSocket(WS_URL);
+  const { wsRef, ready } = useStableWebSocket(WS_URL, (data: string) => {
+    // Handle message
+  });
 
   const handleSend = async () => {
     setSending(true);

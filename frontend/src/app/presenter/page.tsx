@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const WS_URL = "wss://presentation-app-backend.daigaku-150207.workers.dev/ws"; // Cloudflare Workers本番用
 
-function useStableWebSocket(url: string, onMessage: (data: any) => void) {
+function useStableWebSocket(url: string, onMessage: (data: string) => void) {
   const wsRef = useRef<WebSocket | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -24,7 +24,7 @@ function useStableWebSocket(url: string, onMessage: (data: any) => void) {
         ws?.close();
       };
       ws.onmessage = (event) => {
-        onMessage(event.data);
+        onMessage(event.data as string);
       };
     };
     connect();
@@ -40,7 +40,7 @@ export default function Presenter() {
   const [show, setShow] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleMessage = (data: any) => {
+  const handleMessage = (data: string) => {
     try {
       const parsed = JSON.parse(data);
       if (parsed.type === "stamp") {
